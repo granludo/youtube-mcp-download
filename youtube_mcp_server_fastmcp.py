@@ -563,11 +563,11 @@ async def get_video_metadata(url: str) -> Dict[str, Any]:
                 "formats_available": len(metadata.get("formats", []))
             }
 
-            # Check if video has been downloaded and get file path
+            # Check if video has been downloaded and get all database fields
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT file_path FROM videos
+                SELECT * FROM videos
                 WHERE source_url = ?
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -576,7 +576,20 @@ async def get_video_metadata(url: str) -> Dict[str, Any]:
             row = cursor.fetchone()
             conn.close()
 
-            if row and row["file_path"]:
+            if row:
+                # Add all database fields to the metadata
+                clean_metadata["database_info"] = {
+                    "id": row["id"],
+                    "title": row["title"],
+                    "description": row["description"],
+                    "duration": row["duration"],
+                    "file_path": row["file_path"],
+                    "source_url": row["source_url"],
+                    "job_id": row["job_id"],
+                    "playlist": row["playlist"],
+                    "pl_index": row["pl_index"],
+                    "created_at": row["created_at"]
+                }
                 clean_metadata["file_path"] = row["file_path"]
                 clean_metadata["downloaded"] = True
             else:

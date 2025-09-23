@@ -1,0 +1,10 @@
+[project]
+name = "youtube-download"
+version = "0.1.0"
+description = "Advanced YouTube video and playlist downloader with MCP server"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "yt-dlp>=2023.1.1",
+    "mcp>=0.1.0"
+]

@@ -209,7 +209,8 @@ def run_yt_dlp(url: str, output_template: str, job_id: str, job_type: str, max_v
                         title = metadata.get("title", "unknown")
                         sanitized_title = title.replace("/", "_").replace("\\", "_").replace("|", "_").replace("?", "_").replace("*", "_").replace("<", "_").replace(">", "_").replace('"', "_").replace(":", "_")
                         expected_filename = f"{sanitized_title}.mp4"
-                        file_path = os.path.join(output_template.split("%(title)s")[0].rstrip("/"), expected_filename)
+                        base_dir = os.path.dirname(output_template)
+                        file_path = os.path.abspath(os.path.join(base_dir, expected_filename))
 
                         cursor.execute('''
                             INSERT INTO videos (id, title, description, duration, file_path, source_url, job_id, playlist, pl_index)
@@ -284,7 +285,8 @@ def run_yt_dlp(url: str, output_template: str, job_id: str, job_type: str, max_v
                     # Basic sanitization that yt-dlp does
                     sanitized_title = title.replace("/", "_").replace("\\", "_").replace("|", "_").replace("?", "_").replace("*", "_").replace("<", "_").replace(">", "_").replace('"', "_").replace(":", "_")
                     expected_filename = f"{sanitized_title}.mp4"
-                    file_path = os.path.join(output_template.split("%(title)s")[0].rstrip("/"), expected_filename)
+                    base_dir = os.path.dirname(output_template)
+                    file_path = os.path.abspath(os.path.join(base_dir, expected_filename))
 
                     cursor.execute('''
                         INSERT INTO videos (id, title, description, duration, file_path, source_url, job_id, playlist, pl_index)

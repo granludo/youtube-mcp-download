@@ -1,4 +1,6 @@
 downloads/*
+*.db
+*.txt
 .DS_Store
 __pycache__/*
 *.pyc
@@ -29,3 +31,4 @@ uv.lock.json.lock.json.lock.json
 uv.lock.json.lock.json.lock.json.lock
 uv.lock.json.lock.json.lock.json.lock.json
 uv.lock.json.lock.json.lock.json.lock.json.lock
+youtube_library.db

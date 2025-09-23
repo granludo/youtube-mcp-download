@@ -11,12 +11,12 @@ import os
 
 def main():
     """Start the YouTube MCP server"""
-    print("🎬 Starting YouTube MCP Server...")
+    print("Starting YouTube MCP Server...", file=sys.stderr)
 
     # Check if we're in the right directory
     if not os.path.exists("youtube_mcp_server_fastmcp.py"):
-        print("❌ Error: youtube_mcp_server_fastmcp.py not found in current directory")
-        print("Please run this from the youtube_download directory")
+        print("Error: youtube_mcp_server_fastmcp.py not found in current directory", file=sys.stderr)
+        print("Please run this from the youtube_download directory", file=sys.stderr)
         sys.exit(1)
 
     # Import and run the FastMCP server directly
@@ -26,7 +26,7 @@ def main():
         # This will run the server and never return - it waits for stdio input
         youtube_mcp_server_fastmcp.main()
     except Exception as e:
-        print(f"❌ Error starting server: {e}")
+        print(f"Error starting server: {e}", file=sys.stderr)
         sys.exit(1)
 
 

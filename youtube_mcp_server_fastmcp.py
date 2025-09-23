@@ -68,7 +68,7 @@ def setup_database():
 
     conn.commit()
     conn.close()
-    print("✓ Database initialized", file=sys.stderr)
+    print("Database initialized", file=sys.stderr)
 
 
 def get_db_connection():
@@ -744,7 +744,7 @@ async def get_playlist_metadata(url: str) -> Dict[str, Any]:
 def main():
     """Main entry point for the FastMCP server"""
     # Print to stderr so it doesn't interfere with MCP stdio protocol
-    print("🎬 YouTube MCP Server (FastMCP) starting...", file=sys.stderr)
+    print("YouTube MCP Server (FastMCP) starting...", file=sys.stderr)
     setup_database()
 
     # Run the FastMCP server

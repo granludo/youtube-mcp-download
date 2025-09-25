@@ -531,13 +531,74 @@ async def list_downloads() -> Dict[str, Any]:
 @mcp.tool()
 async def get_video_metadata(url: str) -> Dict[str, Any]:
     """
-    Fetch metadata about a video without downloading it.
-    Also includes file path if the video has been downloaded.
+    Fetch metadata about a video or playlist URL.
+    Returns information from database if the URL has been processed before,
+    or fetches fresh metadata for new URLs.
 
     Args:
-        url: The URL of the video
+        url: The URL of the video or playlist
     """
     try:
+        # Check if this is a playlist URL
+        is_playlist_url = "playlist" in url.lower() or "&list=" in url or "?list=" in url
+        
+        if is_playlist_url:
+            # Check if this playlist URL exists in our database
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Look for this URL in jobs table
+            cursor.execute('''
+                SELECT * FROM jobs WHERE url = ?
+            ''', (url,))
+            job_row = cursor.fetchone()
+            
+            if job_row:
+                # Get associated videos from this playlist job
+                cursor.execute('''
+                    SELECT * FROM videos WHERE job_id = ?
+                    ORDER BY pl_index
+                ''', (job_row["id"],))
+                video_rows = cursor.fetchall()
+                
+                conn.close()
+                
+                # Return information about the playlist job and its videos
+                result = {
+                    "type": "playlist",
+                    "url": url,
+                    "job_info": {
+                        "id": job_row["id"],
+                        "status": job_row["status"],
+                        "progress": job_row["progress"],
+                        "created_at": job_row["created_at"],
+                        "completed_at": job_row["completed_at"],
+                        "error_message": job_row["error_message"]
+                    },
+                    "video_count": len(video_rows),
+                    "videos": []
+                }
+                
+                # Add video information
+                for video in video_rows:
+                    result["videos"].append({
+                        "id": video["id"],
+                        "title": video["title"],
+                        "duration": video["duration"],
+                        "file_path": video["file_path"],
+                        "source_url": video["source_url"],
+                        "playlist_index": video["pl_index"]
+                    })
+                
+                return result
+            else:
+                conn.close()
+                # Playlist URL not in database, suggest using playlist metadata tool
+                return {
+                    "error": "This appears to be a new playlist URL not in your database. Please use the get_playlist_metadata tool for fresh playlist information."
+                }
+        
+        # Handle regular video URLs
         cmd = [
             sys.executable, "-m", "yt_dlp",
             "--no-warnings",
